@@ -1,0 +1,52 @@
+在hadoop运行状态下，
+1.将hbase-0.94.6.tar.gz拷贝到/home/hadoop文件夹下，并在此文件夹下解压并将文件名改为hbase
+2.配置hbase环境变量/etc/profile
+export HBASE_HOME=/home/hadoop/hbase
+export PATH=$PATH:$HBASE_HOME/bin
+修改完了之后，分发给各个从机，并输入source /etc/profile使命令生效
+如果还不生效就只能重启了
+3.修改/home/hadoop/hbase/conf下的配置文件
+修改hbase-site.xml
+<configuration>
+        <property>
+                <name>hbase.master </name>
+                <value>master:60000 </value>
+         </property>
+         <property>
+                <name>hbase.master.maxclockskew </name>
+                <value>180000 </value>
+         </property>
+         <property>
+                <name>hbase.rootdir</name>
+                <value>hdfs://master:9000/hbase</value>
+         </property>
+         <property>
+                <name>hbase.cluster.distributed</name>
+                <value>true</value>
+        </property>
+        <property>
+                <name>hbase.zookeeper.quorum</name>
+                <value>slave1,slave2</value>
+        </property>
+        <property>
+                <name>hbase.zookeeper.property.dataDir</name>
+                <value>/home/${user.name}/tmp/zookeeper</value>
+        </property>
+</configuration>
+修改hbase-env.sh
+ export JAVA_HOME=/usr/java/jdk1.6.0_45
+ export HBASE_CLASSPATH=/home/hadoop/hbase/conf
+ export HBASE_MANAGES_ZK=true
+ 配置regionservers，添加从机
+ slave1
+ slave2
+ 分发到各从节点
+ scp -r ~/hbase hadoop@slaveX:~/
+ 4.启动hbase
+ start-hbase.sh
+ 5.命令行以及界面验证hbase的安装
+ 命令行验证
+ hbase shell
+ list
+ 界面验证
+ http：//master:60010
